@@ -174,7 +174,26 @@ int tmin(void) {
  *   Rating: 1
  */
 int isTmax(int x) {
-  return 2;
+  /*
+   * maximum two's complement 32-bit integer is tmax = 0x7fffffff
+   * tmax = 0x7fffffff
+   * tmax + 1 = 0x80000000
+   * observation: ~tmax = tmax + 1
+   *
+   * how to implement x == y using legal ops?
+   * observation: x ^ y = 0 only when y = x
+   * implementation: !(x ^ y)
+   *
+   * but can there exists x != tmax such that ~x = x + 1?
+   * x =     [...]01...1
+   * x + 1 = [...]10...0
+   * ~x = x + 1 only if [...] part is empty
+   * should exclude x = 0xffffffff (x + 1 = 0)
+   * introduce + !(x + 1) to exclude such case
+   * when x + 1 != 0 this term disappears
+   * otherwise this term forces the function to return 0
+   */
+  return !(~x ^ (x + 1) + !(x + 1)); // 7 ops
 }
 /* 
  * allOddBits - return 1 if all odd-numbered bits in word set to 1
