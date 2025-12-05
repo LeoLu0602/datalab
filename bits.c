@@ -1,4 +1,5 @@
-/* 
+/*
+ *
  * CS:APP Data Lab 
  * 
  * <Please put your name and userid here>
@@ -143,7 +144,13 @@ NOTES:
  *   Rating: 1
  */
 int bitXor(int x, int y) {
-  return 2;
+  /*
+   * x ^ y = x'y + xy' (from truth table of xor)
+   * x + y = (x'y')' (De Morgan's laws)
+   * x ^ y = ((x'y)'(xy')')' (8 ops)
+  */
+  
+  return ~(~(~x & y) & ~(x & ~y));
 }
 /* 
  * tmin - return minimum two's complement integer 
