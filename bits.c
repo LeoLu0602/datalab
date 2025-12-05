@@ -148,7 +148,7 @@ int bitXor(int x, int y) {
    * x ^ y = x'y + xy' (from truth table of xor)
    * x + y = (x'y')' (De Morgan's laws)
    * x ^ y = ((x'y)'(xy')')' (8 ops)
-  */
+   */
   
   return ~(~(~x & y) & ~(x & ~y));
 }
@@ -159,8 +159,10 @@ int bitXor(int x, int y) {
  *   Rating: 1
  */
 int tmin(void) {
-
-  return 2;
+  /*
+   * minimum two's complement 32-bit integer is 0x80000000
+   */
+  return 1 << 31;
 
 }
 //2
