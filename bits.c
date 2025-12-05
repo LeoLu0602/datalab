@@ -204,7 +204,20 @@ int isTmax(int x) {
  *   Rating: 2
  */
 int allOddBits(int x) {
-  return 2;
+  /*
+   * create a mask 0xAAAAAAAA
+   * constants are at most 8-bit long
+   * mask = 0xAA << 24 | 0xAA << 16 | 0xAA << 8 | 0xAA
+   * if x & mask == mask => return true, return false otherwise
+   */
+  int mask = 0;
+  
+  mask = mask | 0xAA;
+  mask = mask | (0xAA << 8);
+  mask = mask | (0xAA << 16);
+  mask = mask | (0xAA << 24);
+
+  return !((x & mask) ^ mask);
 }
 /* 
  * negate - return -x 
