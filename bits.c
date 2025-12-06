@@ -266,7 +266,18 @@ int isAsciiDigit(int x) {
  *   Rating: 3
  */
 int conditional(int x, int y, int z) {
-  return 2;
+  /*
+   * how to make mask 0xffffffff if x != 0 and 0x00000000 if x == 0?
+   * cond = x ? 1 : 0, this simplifies x != 0 case
+   * 1 -> 0xffffffff:
+   * -1 in two's complement: 0xffffffff
+   * 0 -> 0x00000000:
+   * 0 in two's complement: 0x00000000
+   */
+  int cond = !!x; // force cond to take either 0 or 1
+  int mask = ~cond + 1; // 1 -> 0xffffffff, 0 -> 0x00000000
+
+  return (y & mask) | (z & ~mask);
 }
 /* 
  * isLessOrEqual - if x <= y  then return 1, else return 0 
