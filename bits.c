@@ -227,6 +227,12 @@ int allOddBits(int x) {
  *   Rating: 2
  */
 int negate(int x) {
+  /*
+   * x is equivalent to x + 2^n in two's complement
+   * -x is equivalent to -x + 2^n in two's complement
+   * 2^n - 1 - x flips all bits in x (2^n - 1 is all ones)
+   * -x = (2^n - 1 - x) + 1 = ~x + 1
+   */
   return ~x + 1;
 }
 //3
@@ -240,7 +246,17 @@ int negate(int x) {
  *   Rating: 3
  */
 int isAsciiDigit(int x) {
-  return 2;
+  /*
+   * if x is ascii digit => d1 >= 0 and d2 >= 0
+   * MSB of both d1 and d2 are 0
+   * if x is not ascii digit => (d1 < 0 and d2 > 0) or (d1 > 0 and d2 < 0)
+   * at least one MSB of d1 and d2 is 1
+   */
+  int d1 = x + (~0x30 + 1); // x - 0x30
+  int d2 = 0x39 + (~x + 1); // 0x39 - x
+  int mask = 1 << 31;
+
+  return !((d1 & mask) | (d2 & mask));
 }
 /* 
  * conditional - same as x ? y : z 
