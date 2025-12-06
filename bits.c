@@ -287,7 +287,10 @@ int conditional(int x, int y, int z) {
  *   Rating: 3
  */
 int isLessOrEqual(int x, int y) {
-  return 2;
+  /*
+   * use MSB of y - x
+   */
+  return !((y + (~x + 1)) & (1 << 31));
 }
 //4
 /* 
