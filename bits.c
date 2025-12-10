@@ -326,6 +326,7 @@ int howManyBits(int x) {
    * if x < 0 => x = ~x
    * now the problem becomes finding the leftmost one
    * if the top n bits are nonzero => pos += n, x >>= n
+   * if the top n bits are zeros => pos and x remain the same, can now ignore top n bits of x
    * ans = pos + 1 (one additional sign bit)
    */
   int mask = x >> 31;
@@ -364,7 +365,38 @@ int howManyBits(int x) {
  *   Rating: 4
  */
 unsigned floatScale2(unsigned uf) {
-  return 2;
+  /*
+   * IEEE 754
+   * 
+   * s: 1
+   * e: 8
+   * f: 23
+   * 
+   * e == 255 and f == 0: NaN
+   * e == 255 and f != 0: infinity
+   * e == 0 and f == 0: 0
+   * e == 0 and f != 0: denormalized
+   */
+  unsigned e = (uf >> 23) & 0xff;
+  unsigned f = uf & 0x7fffff;
+
+  if (e == 255) {
+    return uf;
+  }
+
+  if (e == 0) {
+    if (f) {
+      uf &= 0xff800000; // clear f
+      uf |= (f << 1);  // set new f
+    }
+
+    return uf;
+  }
+
+  uf &= 0x807fffff; // clear e
+  uf |= (e + 1) << 23; // set new e
+  
+  return uf;
 }
 /* 
  * floatFloat2Int - Return bit-level equivalent of expression (int) f
