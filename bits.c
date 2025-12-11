@@ -411,7 +411,37 @@ unsigned floatScale2(unsigned uf) {
  *   Rating: 4
  */
 int floatFloat2Int(unsigned uf) {
-  return 2;
+  /*
+   * IEEE 754
+   *
+   * s: 1
+   * e: 8
+   * f: 23
+   * 
+   * e == 255 and f == 0: NaN
+   * e == 255 and f != 0: infinity
+   * e == 0 and f == 0: 0
+   * e == 0 and f != 0: denormalized
+   *
+   * 2^(e - 127) < 2^32
+   */
+  unsigned s = uf >> 31;
+  unsigned e = (uf >> 23) & 0xff; 
+  int pow = e - 127;
+
+  if (pow >= 32) {
+    return 1 << 31;
+  }
+
+  if (pow >= 0) {
+    if (s) {
+      return ~(1 << pow) + 1;
+    }
+
+    return 1 << pow;
+  }
+
+  return 0;
 }
 /* 
  * floatPower2 - Return bit-level equivalent of the expression 2.0^x
