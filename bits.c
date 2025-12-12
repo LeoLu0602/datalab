@@ -412,19 +412,22 @@ unsigned floatScale2(unsigned uf) {
  */
 int floatFloat2Int(unsigned uf) {
   /*
-   * IEEE 754
+   * 1. e == 255: 
    *
-   * s: 1
-   * e: 8
-   * f: 23
-   *
-   * bias = 127
+   * NaN or infinity 
+   * => out of range 
    * 
-   * e == 255 and f == 0: NaN
-   * e == 255 and f != 0: infinity
-   * 1 <= e <= 254: 1.f * 2^(e - bias)
-   * e == 0 and f == 0: 0
-   * e == 0 and f != 0: denormalized (0.f * 2^(1 - bias))
+   * 2. e == 0: 
+   *
+   * val = (-1)^s * 0.f * 2^(1 - bias) = (-1)^s * 0.f * 2^(1 - 127) 
+   * => return 0
+   * 
+   * 3. 1 <= e <= 254: 
+   * 
+   * pow = e - bias = e - 127
+   * val = (-1)^s * 1.f * 2^pow
+   * 0 <= (int)1.f * 2^pow <= 2^31 - 1
+   * (int)1.f * 2^pow: 1 followed by top pow bits of f
    */
   unsigned s = uf >> 31;
   unsigned e = (uf >> 23) & 0xff; 
@@ -432,17 +435,23 @@ int floatFloat2Int(unsigned uf) {
   int pow = e - 127;
   int val = 0;
 
-  // out of range
-  if (pow > 30) {
+  if (e == 255) {
     return 1 << 31;
+  }
+
+  if (e == 0) {
+    return 0;
   }
   
   if (pow < 0) {
     return 0;
   }
-  
-  // 0 <= pow <= 30
-  val = ((1 << 31) | (f << 8)) >> (32 - pow - 1);
+
+  if (1 + pow > 31) {
+    return 1 << 31;
+  }
+
+  val = (1 << pow) | (f >> (23 - pow));
 
   return s ? -val : val;
 }
