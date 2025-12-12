@@ -417,31 +417,34 @@ int floatFloat2Int(unsigned uf) {
    * s: 1
    * e: 8
    * f: 23
+   *
+   * bias = 127
    * 
    * e == 255 and f == 0: NaN
    * e == 255 and f != 0: infinity
+   * 1 <= e <= 254: 1.f * 2^(e - bias)
    * e == 0 and f == 0: 0
-   * e == 0 and f != 0: denormalized
-   *
-   * 2^(e - 127) < 2^32
+   * e == 0 and f != 0: denormalized (0.f * 2^(1 - bias))
    */
   unsigned s = uf >> 31;
   unsigned e = (uf >> 23) & 0xff; 
+  unsigned f = uf & 0x7fffff;
   int pow = e - 127;
+  int val = 0;
 
-  if (pow >= 32) {
+  // out of range
+  if (pow > 30) {
     return 1 << 31;
   }
-
-  if (pow >= 0) {
-    if (s) {
-      return ~(1 << pow) + 1;
-    }
-
-    return 1 << pow;
+  
+  if (pow < 0) {
+    return 0;
   }
+  
+  // 0 <= pow <= 30
+  val = ((1 << 31) | (f << 8)) >> (32 - pow - 1);
 
-  return 0;
+  return s ? -val : val;
 }
 /* 
  * floatPower2 - Return bit-level equivalent of the expression 2.0^x
