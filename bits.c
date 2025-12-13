@@ -446,6 +446,13 @@ int floatFloat2Int(unsigned uf) {
   if (pow < 0) {
     return 0;
   }
+  
+  // handle -2^31
+  // 32-bit int range: -2^31 to 2^31 - 1
+  // not every positive number corresponds to one negative number
+  if (pow == 31 && s == 1 && f == 0) {
+    return -(1 << 31);
+  }
 
   if (1 + pow > 31) {
     return 1 << 31;
