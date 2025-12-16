@@ -476,5 +476,32 @@ int floatFloat2Int(unsigned uf) {
  *   Rating: 4
  */
 unsigned floatPower2(int x) {
-    return 2;
+  /*
+   * s is 0
+   * 
+   * norm: 
+   * 1 <= e = x + 127 <= 254
+   * -126 <= x <= 127
+   * 
+   * denorm:
+   * 0.f * 2^(1 - 127) = 0.f * 2^(-126)
+   * f = (1 << 23) >> n
+   * 1 <= n <= 23
+   * x = -126 - n
+   * n = -x - 126
+   * -149 <= x <= -127
+   */
+  if (x > 127) {
+    return 0xff << 23;
+  }
+
+  if (x < -149) {
+    return 0;
+  }
+
+  if (x >= -126) {
+    return (x + 127) << 23;
+  }
+
+  return (1 << 23) >> (-x - 126); 
 }
